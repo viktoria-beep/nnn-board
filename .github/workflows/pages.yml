@@ -24,6 +24,8 @@ jobs:
           import re
 
 
+
+
           bundle = Path('site/_next/static/immutable/chunks/0d76mczvsbu73.js')
           source = bundle.read_text()
           start = source.index('let K=(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(sr.f,{label:"Вид доски"')
@@ -41,11 +43,18 @@ jobs:
           stage = '[c,o]=(0,l.useState)(0),[h,m]=(0,l.useState)(!0),p=(0,l.useRef)(0),f=tD[c].year'
           assert source.count(stage) == 1
           source = source.replace(stage, '[c,o]=(0,l.useState)(tO),[h,m]=(0,l.useState)(!1),p=(0,l.useRef)(tO),f=tD[c].year')
+          panel = source.index('function eO({id:e,onClose:l})')
+          start = source.index('children:a.phrase', panel)
+          tail = source.index(',a.facts.length', start)
+          end = source.index('function eL(', tail)
+          summary = "(e===\"dependency\"?({\"access\":\"Если провайдер блокирует аккаунт или отрасль, NNN может перенаправить допустимые задачи другому поставщику.\",\"policy\":\"Если правила в регионе меняются, NNN может перенести допустимые задачи в регион, где их можно выполнять.\",\"physical\":\"Если дата-центр выходит из строя, задачи можно перенести на резервные площадки.\",\"market\":\"Если поставщик прекращает работу, сеть может перераспределить задачи между другими поставщиками.\",\"product\":\"Если провайдер снимает или меняет модель, NNN может использовать доступную версию на другой площадке.\"})[riskCategory]:({\"clubs\":\"Клубы сдают простаивающие видеокарты. NNN платит за часы работы и отдаёт им пакетные задачи. Доля в модели на 2031 год — 12%.\",\"homes\":\"Владельцы подключают домашние GPU и получают оплату за работу. В модели на 2031 год — около 6 800 узлов и 55% вычислительной нагрузки.\",\"dc\":\"Дата-центры покрывают старт, пики нагрузки и приватные задачи. В модели на 2031 год — 28% вычислительной нагрузки.\",\"telco\":\"С 2030 года NNN планирует подключать свободные мощности телекомов и государственных площадок. Доля в модели на 2031 год — 5%.\",\"network\":\"Движок выбирает, где выполнить задачу, по цене, доступности и требованиям к данным. Если узел отключается, задачу можно перенести на другой.\",\"affiliates\":\"Партнёрские программы получают фабрику креативов под своим брендом. В модели на 2031 год — $12,3 млн выручки от внешних партнёрок.\",\"independence\":\"Компании получают доступ к моделям через один API. При сбое задачи можно перенести к другому поставщику. В модели на 2031 год — $21,7 млн выручки.\",\"b2b\":\"Пакетная обработка документов и аудио использует свободные мощности. В модели на 2031 год — $3,4 млн выручки.\",\"token\":\"По плану 10% выручки от заказа направляется на выкуп и сжигание токена. Владельцам GPU платят деньгами, токен служит бонусом.\"})[e])??a.phrase"
+          source = source[:start] + source[start:tail].replace('children:a.phrase', 'children:' + summary) + ']})]})}' + source[end:]
+          source = source.replace('function eO({id:e,onClose:l}){let a=', 'function eO({id:e,onClose:l}){let {riskCat:riskCategory}=x(),a=', 1)
           bundle.write_text(source)
           page = Path('site/index.html')
           html = page.read_text().replace('<html lang="ru"', '<html lang="ru" translate="no"')
           html = html.replace('</head>', '<meta name="google" content="notranslate"></head>', 1)
-          versioned = bundle.with_name('nnn-engine-v4.js')
+          versioned = bundle.with_name('nnn-engine-v5.js')
           bundle.rename(versioned)
           html = html.replace(bundle.name, versioned.name)
           html = html.replace('</head>', '<style>div:has(>[aria-label="Вид доски"]),div[class="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"]{display:none!important}</style></head>', 1)
