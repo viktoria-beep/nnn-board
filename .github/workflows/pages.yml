@@ -38,6 +38,10 @@ jobs:
           page = Path('site/index.html')
           html = page.read_text().replace('<html lang="ru"', '<html lang="ru" translate="no"')
           html = html.replace('</head>', '<meta name="google" content="notranslate"></head>', 1)
+          versioned = bundle.with_name('nnn-engine-v2.js')
+          bundle.rename(versioned)
+          html = html.replace(bundle.name, versioned.name)
+          html = html.replace('</head>', '<style>div:has(>[aria-label="Вид доски"]),div[class="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"]{display:none!important}</style></head>', 1)
           page.write_text(html)
           PY
       - uses: actions/upload-pages-artifact@v4
