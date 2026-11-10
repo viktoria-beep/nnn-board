@@ -37,15 +37,19 @@ jobs:
           source = source.replace('null!==e&&m("board")', 'null!==e&&m("engine")')
           marker = 'tY.map((s,l)=>(0,t.jsx)(ss,'
           assert source.count(marker) == 1
-          source = source.replace(marker, 'tY.map((s,l)=>s.label==="1Win"?null:(0,t.jsx)(ss,')
+          source = source.replace(marker, 'tY.map((s,l)=>(s.label==="1Win"||s.label==="B2C")?null:(0,t.jsx)(ss,')
+          stage = '[c,o]=(0,l.useState)(0),[h,m]=(0,l.useState)(!0),p=(0,l.useRef)(0),f=tD[c].year'
+          assert source.count(stage) == 1
+          source = source.replace(stage, '[c,o]=(0,l.useState)(tO),[h,m]=(0,l.useState)(!1),p=(0,l.useRef)(tO),f=tD[c].year')
           bundle.write_text(source)
           page = Path('site/index.html')
           html = page.read_text().replace('<html lang="ru"', '<html lang="ru" translate="no"')
           html = html.replace('</head>', '<meta name="google" content="notranslate"></head>', 1)
-          versioned = bundle.with_name('nnn-engine-v3.js')
+          versioned = bundle.with_name('nnn-engine-v4.js')
           bundle.rename(versioned)
           html = html.replace(bundle.name, versioned.name)
           html = html.replace('</head>', '<style>div:has(>[aria-label="Вид доски"]),div[class="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"]{display:none!important}</style></head>', 1)
+          html = html.replace('</head>', '<style>.eng div.flex.flex-col:has(button[aria-label="Проиграть рост"]),.eng div.pointer-events-none button.group.text-center{display:none!important}</style></head>', 1)
           page.write_text(html)
           PY
       - uses: actions/upload-pages-artifact@v4
