@@ -16,7 +16,30 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/configure-pages@v5
-      - run: unzip -q nnn-board.zip -d site
+      - name: Prepare engine-only page
+        run: |
+          unzip -q nnn-board.zip -d site
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          bundle = Path('site/_next/static/immutable/chunks/0d76mczvsbu73.js')
+          source = bundle.read_text()
+          start = source.index('let K=(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(sr.f,{label:"Вид доски"')
+          end = source.index('return(0,t.jsxs)("div",{className:', start)
+          source = source[:start] + source[end:]
+          start = source.index(',right:(0,t.jsx)("div",{className:"hidden items-center gap-2 lg:flex",children:K})')
+          end = source.index('children:K})', start + len(',right:(0,t.jsx)("div",{className:"hidden items-center gap-2 lg:flex",children:K})')) + len('children:K})')
+          source = source[:start] + source[end:]
+          assert source.count('[A,I]=(0,l.useState)(!0)') == 1
+          source = source.replace('[A,I]=(0,l.useState)(!0)', '[A,I]=(0,l.useState)(!1)')
+          source = source.replace('null!==e&&m("board")', 'null!==e&&m("engine")')
+          bundle.write_text(source)
+          page = Path('site/index.html')
+          html = page.read_text().replace('<html lang="ru"', '<html lang="ru" translate="no"')
+          html = html.replace('</head>', '<meta name="google" content="notranslate"></head>', 1)
+          page.write_text(html)
+          PY
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
