@@ -23,6 +23,7 @@ jobs:
           from pathlib import Path
           import re
 
+
           bundle = Path('site/_next/static/immutable/chunks/0d76mczvsbu73.js')
           source = bundle.read_text()
           start = source.index('let K=(0,t.jsxs)(t.Fragment,{children:[(0,t.jsx)(sr.f,{label:"Вид доски"')
@@ -34,11 +35,14 @@ jobs:
           assert source.count('[A,I]=(0,l.useState)(!0)') == 1
           source = source.replace('[A,I]=(0,l.useState)(!0)', '[A,I]=(0,l.useState)(!1)')
           source = source.replace('null!==e&&m("board")', 'null!==e&&m("engine")')
+          marker = 'tY.map((s,l)=>(0,t.jsx)(ss,'
+          assert source.count(marker) == 1
+          source = source.replace(marker, 'tY.map((s,l)=>s.label==="1Win"?null:(0,t.jsx)(ss,')
           bundle.write_text(source)
           page = Path('site/index.html')
           html = page.read_text().replace('<html lang="ru"', '<html lang="ru" translate="no"')
           html = html.replace('</head>', '<meta name="google" content="notranslate"></head>', 1)
-          versioned = bundle.with_name('nnn-engine-v2.js')
+          versioned = bundle.with_name('nnn-engine-v3.js')
           bundle.rename(versioned)
           html = html.replace(bundle.name, versioned.name)
           html = html.replace('</head>', '<style>div:has(>[aria-label="Вид доски"]),div[class="absolute inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"]{display:none!important}</style></head>', 1)
